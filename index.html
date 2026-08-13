@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>FlowExecutor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  /* ------------------ BASE ------------------ */
+  body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3 {
+    font-weight: 600;
+  }
+
+  /* ------------------ HEADER ------------------ */
+  header {
+    padding: 80px 40px;
+    text-align: center;
+    background: linear-gradient(135deg, #7c3aed55, #0ea5e955);
+    border-bottom: 1px solid #ffffff22;
+    animation: fadeIn 1s ease-out;
+  }
+
+  header h1 {
+    font-size: 3.2rem;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+
+  header p {
+    font-size: 1.2rem;
+    opacity: 0.85;
+  }
+
+  /* ------------------ CONTAINER ------------------ */
+  .container {
+    max-width: 1200px;
+    margin: 70px auto;
+    padding: 0 30px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    opacity: 0.85;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  /* ------------------ CARDS ------------------ */
+  .card {
+    padding: 35px;
+    border-radius: 20px;
+    background: #161b22;
+    border: 1px solid #ffffff15;
+    box-shadow: 0 0 25px #00000055;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 40px #00000088;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #7c3aed33;
+    border: 1px solid #7c3aed88;
+    margin-right: 10px;
+    font-size: 0.8rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: opacity 0.25s ease;
+  }
+
+  .btn:hover {
+    opacity: 0.8;
+  }
+
+  /* ------------------ GRID ------------------ */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ------------------ STATS ------------------ */
+  .stats-box {
+    display: flex;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 50px;
+  }
+
+  .stat {
+    flex: 1;
+    padding: 25px;
+    border-radius: 16px;
+    background: #1b222c;
+    border: 1px solid #ffffff15;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .stat h3 {
+    font-size: 2.2rem;
+    margin: 0;
+  }
+
+  .stat p {
+    opacity: 0.7;
+    margin-top: 8px;
+  }
+
+  /* ------------------ TIMELINE ------------------ */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .timeline-item {
+    padding-left: 20px;
+    border-left: 3px solid #7c3aed;
+  }
+
+  .timeline-item h4 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .timeline-item span {
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+
+  /* ------------------ ANIMATIONS ------------------ */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ------------------ FOOTER ------------------ */
+  footer {
+    margin-top: 100px;
+    padding: 50px;
+    text-align: center;
+    opacity: 0.6;
+    font-size: 0.9rem;
+  }
+
+  /* ------------------ SINGLE DOWNLOAD CTA ------------------ */
+  .download-cta {
+    display:flex;
+    justify-content:center;
+    margin: 28px 0;
+  }
+
+  .download-cta .btn {
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: 999px;
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>FlowExecutor</h1>
+  <p>The most lightweight and beautiful roblox executor ever</p>
+</header>
+
+<div class="container">
+
+  <!-- ------------------ ESTADÍSTICAS ------------------ -->
+  <h2 class="section-title">System status</h2>
+
+  <div class="stats-box">
+    <div class="stat">
+      <h3>80</h3>
+      <p>Unc test</p>
+    </div>
+    <div class="stat">
+      <h3>v0.1.1.3.60</h3>
+      <p>Last version</p>
+    </div>
+    <div class="stat">
+      <h3>Online</h3>
+      <p>System status</p>
+    </div>
+  </div>
+
+  <!-- ------------------ DESCARGA PRINCIPAL ------------------ -->
+  <h2 class="section-title">Download</h2>
+
+  <div class="download-cta">
+    <a id="download-main" class="btn" href="#">Download Flow Executor v0.1.1.3.60</a>
+  </div>
+
+  <div class="grid-2">
+
+    <div class="card">
+      <h3>Flow Executor 0.1.1.3.60</h3>
+      <p>The most lightweight and beautiful roblox executor based on Xeno</p>
+      <span class="tag">Exploit</span>
+      <span class="tag">Roblox Executor</span><br><br>
+      <p style="opacity:0.85">Changes:</p>
+      <ul style="margin-top:8px; color:#cbd5e1">
+        <li>Added Home tab</li>
+        <li>Added Executor tab</li>
+        <li>Added Settings tab (settings not working yet...)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>About Flow Executor</h3>
+      <p>Flow Executor is the most powerful and lightweight Roblox Executor based on Xeno api</p>
+      <span class="tag">Exploit</span>
+      <span class="tag">Docs</span><br><br>
+      <p style="opacity:0.85">Flow executor is:</p>
+      <ul style="margin-top:8px; color:#cbd5e1">
+        <li>Modern and lightweight</li>
+        <li>Fast execution and attachment</li>
+        <li>Key-free</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ------------------ ACTIVIDAD RECIENTE ------------------ -->
+  <h2 class="section-title">Recent activity</h2>
+
+  <div class="timeline">
+
+    <div class="timeline-item">
+      <h4>New Flow Executor version published</h4>
+      <span>8/13/2026 · 8:38 PM</span>
+      <p>Added execution tab, settings tab and home tab</p>
+    </div>
+
+    <div class="timeline-item">
+      <h4>Empty</h4>
+      <span>Empty</span>
+      <p>Empty</p>
+    </div>
+
+    <div class="timeline-item">
+      <h4>Empty</h4>
+      <span>Empty</span>
+      <p>Empty</p>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  FLOWEXECUTOR · v0.1.1.3.60
+</footer>
+
+<script>
+  // Single download action: generates a demo ZIP and triggers download
+  document.getElementById('download-main').addEventListener('click', async function (e) {
+    e.preventDefault();
+
+    // Build a minimal starter package in-memory
+    const zipName = 'FlowExecutor-starter.zip';
+    const indexHtml = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>FlowExecutor Starter</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>body{font-family:Inter,Arial;padding:20px;background:#f7fbff;color:#04202b}</style>
+  </head>
+  <body>
+    <h1>FlowExecutor Starter</h1>
+    <p>Bienvenido al starter de FlowExecutor. Edita index.html para comenzar.</p>
+  </body>
+</html>`;
+
+    const readme = `# FlowExecutor Starter
+
+Este paquete contiene un ejemplo mínimo para FlowExecutor:
+- index.html: demo ejecutable
+- README.md: instrucciones básicas
+
+Instalación:
+1. Descomprime el ZIP
+2. Abre index.html en tu navegador
+`;
+
+    try {
+      // Try to use JSZip if available
+      if (window.JSZip) {
+        const zip = new JSZip();
+        zip.file('index.html', indexHtml);
+        zip.file('README.md', readme);
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = zipName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        alert('Descarga iniciada: ' + zipName);
+      } else {
+        // Fallback: create a simple blob (not a real zip) to trigger download
+        const blob = new Blob([indexHtml + '\n\n' + readme], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        alert('JSZip no está disponible. Se ha descargado un archivo de texto con el contenido.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error al generar la descarga.');
+    }
+  });
+</script>
+
+</body>
+</html>
