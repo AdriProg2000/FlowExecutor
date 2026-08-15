@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link rel="icon" href="images/favicon.png" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="images/favicon.png">
-
 <meta charset="UTF-8">
 <title>FlowExecutor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -289,59 +286,6 @@ footer {
   color: #ccc;
 }
 
-/* ------------------ MODAL ------------------ */
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.modal.show {
-  display: flex;
-  animation: modalFadeIn 0.4s ease-out;
-}
-
-.modal-content {
-  background: #161b22;
-  padding: 40px;
-  border-radius: 20px;
-  width: 600px;
-  max-width: 90%;
-  box-shadow: 0 0 30px #000;
-  transform: scale(0.9);
-  animation: modalScaleIn 0.4s ease-out forwards;
-}
-
-.modal-content h2 {
-  margin-bottom: 20px;
-  text-shadow: 0 0 10px #7c3aed;
-}
-
-.modal-step {
-  margin-bottom: 18px;
-  padding: 14px;
-  background: #1b222c;
-  border-radius: 12px;
-  border: 1px solid #ffffff22;
-  font-size: 0.95rem;
-}
-
-/* ------------------ MODAL ANIMATIONS ------------------ */
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes modalScaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
 /* ------------------ ANIMATIONS ------------------ */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-20px); }
@@ -374,7 +318,7 @@ footer {
   </div>
 
   <div class="top-image">
-    <img src="images/flowexecutorv2.png" alt="FlowExecutor Editor">
+    <img src="images/flowexecutor.png" alt="FlowExecutor Editor">
   </div>
 </div>
 
@@ -384,11 +328,11 @@ footer {
 
   <div class="stats-box reveal">
     <div class="stat">
-      <h3>98</h3>
+      <h3>80</h3>
       <p>Unc test</p>
     </div>
     <div class="stat">
-      <h3>v0.3.1.3.60</h3>
+      <h3>v0.2.1.3.60</h3>
       <p>Last version</p>
     </div>
     <div class="stat">
@@ -399,38 +343,40 @@ footer {
 
   <h2 class="section-title reveal">Download</h2>
 
+  <!-- DESCARGA PRINCIPAL -->
   <div style="text-align:center; margin-bottom:40px;" class="reveal">
-    <a class="btn" href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.2.1.3.60/FlowExecutor0.2.1.3.60.zip">
+    <a class="btn" href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.2.1.3.60/FlowExecutorv0.2.1.3.60.zip">
       <img src="images/xeno_icon.png" class="btn-icon" alt="icon">
-      Download Flow Executor v0.2.1.3.60 Xeno Edition (Easy installation)
+      Download Flow Executor v0.2.1.3.60 Xeno Edition (I wont longer update Xeno design, ill only update dlls)
     </a>
   </div>
 
+  <!-- NUEVA DESCARGA: NEXOMIA EDITION -->
   <div style="text-align:center; margin-bottom:60px;" class="reveal">
-    <button class="btn" id="velocity-download-btn">
-      <img src="images/velocity_icon.ico" class="btn-icon" alt="icon">
-      Download Flow Executor v0.3.1.3.60 Velocity Edition (Recommended)
-    </button>
+    <a class="btn" href="">
+      <img src="images/nexomia.png" class="btn-icon" alt="icon">
+      Download FlowExecutor v0.3.1.3.60 Nexomia Edition (Recommended)
+    </a>
   </div>
 
   <div class="grid-2">
 
     <div class="card reveal">
-      <h3>Flow Executor 0.3.1.3.60 Velocity Edition</h3>
-      <p>The most lightweight and beautiful Roblox executor based on Velocity</p>
+      <h3>Flow Executor 0.3.1.3.60</h3>
+      <p>The most lightweight and beautiful Roblox executor based on Nexomia</p>
       <span class="tag">Exploit</span>
       <span class="tag">Roblox Executor</span><br><br>
       <p style="opacity:0.85">Changes:</p>
       <ul style="margin-top:8px; color:#cbd5e1">
-        <li>Added Velocity APIS</li>
-        <li>Added Terminal Tab</li>
-        <li>Upgraded Script Hub</li>
+        <li>Added Terminal</li>
+        <li>Upgraded ScriptHub</li>
+        <li>Added Nexomia APIs</li>
       </ul>
     </div>
 
     <div class="card reveal">
       <h3>About Flow Executor</h3>
-      <p>Flow Executor is the most powerful and lightweight Roblox Executor based on Xeno API and Velocity API</p>
+      <p>Flow Executor is the most powerful and lightweight Roblox Executor based on Nexomia and Xeno APIs</p>
       <span class="tag">Exploit</span>
       <span class="tag">Docs</span><br><br>
       <p style="opacity:0.85">Flow executor is:</p>
@@ -448,21 +394,21 @@ footer {
   <div class="timeline">
 
     <div class="timeline-item reveal">
-      <h4>First Flow Executor version published</h4>
-      <span>8/13/2026 · 8:38 PM</span>
-      <p>Added execution tab, settings tab and home tab</p>
+      <h4>New Flow Executor version published</h4>
+      <span>8/15/2026 · 10:09 PM</span>
+      <p>Upgraded ScriptHub, new Terminal and Changed XenoAPI -> NexomiaAPI (XenoAPI is still aviable but not recommended)</p>
     </div>
 
     <div class="timeline-item reveal">
       <h4>New Flow Executor version published</h4>
       <span>8/14/2026 · 11:24 AM</span>
-      <p>Added a poor ScriptHub and some settings</p>
+      <p>Added ScriptHub and some settings</p>
     </div>
 
     <div class="timeline-item reveal">
-      <h4>New Flow Executor Velocity edition version published</h4>
-      <span>8/15/2026 · 12:21 PM</span>
-      <p>Added velocity API (requires key), upgraded scripthub and added terminal tab</p>
+      <h4>First Flow Executor version published</h4>
+      <span>8/13/2026 · 8:38 PM</span>
+      <p>Added execution tab, settings tab and home tab</p>
     </div>
 
   </div>
@@ -473,26 +419,9 @@ footer {
   FLOWEXECUTOR · v0.2.1.3.60
 </footer>
 
-<!-- MODAL -->
-<div id="velocity-modal" class="modal">
-  <div class="modal-content">
-    <h2>FlowExecutor Velocity Edition — Step by Step</h2>
-    <div id="velocity-steps"></div>
-    <div style="margin-top:25px; display:flex; justify-content:space-between; gap:15px;">
-      <button id="close-modal" class="btn">
-        Close
-      </button>
-      <a id="final-download" class="btn" href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.3.1.3.60/FlowExecutorVelocity0.3.1.3.60.zip">
-        <img src="images/velocity_icon.ico" class="btn-icon" alt="icon">
-        Download Velocity Edition
-      </a>
-    </div>
-  </div>
-</div>
-
+<!-- TITLE ANIMATION -->
 <script>
-/* TITLE ANIMATION */
-const words = ["fast", "beautiful", "powerful"];
+const words = ["fast", "beautiful", "lightweight"];
 let index = 0;
 const el = document.querySelector(".dynamic-word");
 
@@ -506,8 +435,10 @@ setInterval(() => {
     el.style.transform = "translateY(0)";
   }, 600);
 }, 3000);
+</script>
 
-/* PARTICLES */
+<!-- PARTICLES -->
+<script>
 const container = document.getElementById("particles");
 for (let i = 0; i < 120; i++) {
   const p = document.createElement("div");
@@ -518,8 +449,10 @@ for (let i = 0; i < 120; i++) {
   p.style.animationDelay = Math.random() * 3 + "s";
   container.appendChild(p);
 }
+</script>
 
-/* SCROLL REVEAL */
+<!-- SCROLL REVEAL -->
+<script>
 const reveals = document.querySelectorAll(".reveal");
 function revealOnScroll() {
   const trigger = window.innerHeight * 0.85;
@@ -530,37 +463,6 @@ function revealOnScroll() {
 }
 window.addEventListener("scroll", revealOnScroll);
 revealOnScroll();
-
-/* MODAL LOGIC */
-const velocityBtn = document.getElementById("velocity-download-btn");
-const modal = document.getElementById("velocity-modal");
-const closeModal = document.getElementById("close-modal");
-const stepsContainer = document.getElementById("velocity-steps");
-
-const steps = [
-  "1. Use this roblox <a href='https://github.com/vnnaworks/weblauncher/releases/download/2.1.5/weblauncher.exe' target='_blank' class='step-link'>outdate tool</a>",
-  "2. Go to Windows Security then Virus and threat protection, virus and threat protection settings",
-  "3. Click on manage settings and turn real time protection to off (Its cause Windows Security overdetects Roblox Exploits)",
-  "4. Download the .zip and extract it, there should be a .exe of flow executor, then with the roblox outdate tool, outdate roblox to version to (version-145f189a6a974303)",
-  "If you have any trouble installing Flow Executor Velocity Edition DM me in discord, the username: adrin3a4a_07716"
-];
-
-velocityBtn.addEventListener("click", () => {
-  stepsContainer.innerHTML = steps
-    .map(s => `<div class="modal-step">${s}</div>`)
-    .join("");
-  modal.classList.add("show");
-});
-
-closeModal.addEventListener("click", () => {
-  modal.classList.remove("show");
-});
-
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.classList.remove("show");
-  }
-});
 </script>
 
 </body>
