@@ -1,559 +1,1063 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<link rel="icon" href="images/favicon.png" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="images/favicon.png">
+  <meta charset="UTF-8">
+  <title>Flow Executor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="images/favicon.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset ────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<meta charset="UTF-8">
-<title>FlowExecutor</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    :root {
+      --bg:       #09090b;
+      --bg-card:  #111114;
+      --border:   #27272a;
+      --border-hi:#3f3f46;
+      --text:     #fafafa;
+      --sub:      #a1a1aa;
+      --dim:      #52525b;
+      --accent:   #7c3aed;
+      --accent-lo:rgba(124,58,237,.08);
+      --accent-bd:rgba(124,58,237,.22);
+      --green:    #22c55e;
+      --green-lo: rgba(34,197,94,.1);
+      --green-bd: rgba(34,197,94,.25);
+    }
 
-<style>
-/* ------------------ BASE ------------------ */
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #0d1117;
-  color: #e6edf3;
-  line-height: 1.6;
-  overflow-x: hidden;
-  position: relative;
-}
+    html { scroll-behavior: smooth; }
 
-/* ------------------ PARTICULAS ------------------ */
-#particles {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: -1;
-}
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
 
-.particle {
-  position: absolute;
-  width: 7px; height: 7px;
-  background: rgba(200,200,200,0.55);
-  border-radius: 50%;
-  animation: floatParticle linear infinite;
-}
+    ::selection { background: rgba(124,58,237,.25); }
 
-@keyframes floatParticle {
-  from { transform: translateY(0); opacity: 1; }
-  to   { transform: translateY(-180px); opacity: 0.2; }
-}
+    /* ── Subtle ambient glow ─────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60vw;
+      height: 60vh;
+      background: radial-gradient(ellipse at center, rgba(124,58,237,.09) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-/* ------------------ SCROLL ANIMATIONS ------------------ */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.9s ease;
-}
+    /* ── Nav ─────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      padding: 0 32px;
+      background: rgba(9,9,11,.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
 
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+    .nav-logo {
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      color: var(--text);
+    }
 
-/* ------------------ HEADER ------------------ */
-header {
-  padding: 120px 40px 80px;
-  text-align: center;
-  background: linear-gradient(135deg, #7c3aed55, #0ea5e955);
-  border-bottom: 1px solid #ffffff22;
-  animation: fadeIn 1.2s ease-out;
-}
+    .nav-logo span { color: var(--dim); font-weight: 400; }
 
-header h1 {
-  font-size: 3.6rem;
-  margin-bottom: 12px;
-  letter-spacing: 3px;
-  text-shadow: 0 0 20px #7c3aed;
-}
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 4px;
+    }
 
-/* ------------------ TITLE ANIMATION ------------------ */
-.dynamic-word {
-  display: inline-block;
-  min-width: 140px;
-  text-align: left;
-  color: #ec4899;
-  text-shadow: 0 0 15px #ec4899;
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
+    .nav-links a {
+      display: block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: var(--sub);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      transition: color .15s, background .15s;
+    }
 
-header p {
-  font-size: 1.3rem;
-  opacity: 0.9;
-}
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.05); }
 
-/* ------------------ TOP SECTION ------------------ */
-.top-section {
-  max-width: 1200px;
-  margin: 60px auto;
-  padding: 0 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 50px;
-}
+    .nav-right { display: flex; align-items: center; gap: 12px; }
 
-.top-text {
-  flex: 1;
-}
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .78rem;
+      color: var(--sub);
+    }
 
-.top-text h2 {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
-  text-shadow: 0 0 10px #7c3aed;
-}
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 2px var(--green-lo);
+    }
 
-.top-text p {
-  opacity: 0.85;
-  font-size: 1.1rem;
-}
+    /* ── Hero ────────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 96px 24px 80px;
+      z-index: 1;
+    }
 
-.top-image {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-hi);
+      background: rgba(255,255,255,.03);
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--sub);
+      letter-spacing: .01em;
+    }
 
-.top-image img {
-  width: 100%;
-  max-width: 480px;
-  border-radius: 22px;
-  box-shadow: 0 0 40px #000000aa;
-  border: 1px solid #ffffff22;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
+    .kicker-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
 
-.top-image img:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 60px #7c3aedaa;
-}
+    .hero-h1 {
+      font-size: clamp(2.6rem, 7vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -.04em;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
 
-/* ------------------ CONTAINER ------------------ */
-.container {
-  max-width: 1200px;
-  margin: 80px auto;
-  padding: 0 30px;
-}
+    .hero-h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
 
-.section-title {
-  font-size: 1.7rem;
-  margin-bottom: 35px;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  opacity: 0.9;
-  text-shadow: 0 0 10px #7c3aed;
-}
+    .word-swap {
+      display: inline-block;
+      transition: opacity .3s ease, transform .3s ease;
+    }
 
-/* ------------------ STATS ------------------ */
-.stats-box {
-  display: flex;
-  justify-content: space-between;
-  gap: 30px;
-  margin-bottom: 60px;
-}
+    .hero-p {
+      max-width: 480px;
+      font-size: 1.05rem;
+      color: var(--sub);
+      margin: 0 auto 40px;
+      line-height: 1.65;
+      font-weight: 400;
+    }
 
-.stat {
-  flex: 1;
-  padding: 35px;
-  border-radius: 20px;
-  background: #1b222c;
-  border: 1px solid #ffffff15;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 72px;
+    }
 
-.stat:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 0 40px #7c3aed55;
-}
+    /* Screenshot */
+    .hero-shot {
+      position: relative;
+      width: 100%;
+      max-width: 860px;
+    }
 
-.stat h3 {
-  font-size: 2.6rem;
-  margin: 0;
-  text-shadow: 0 0 10px #7c3aed;
-}
+    .hero-shot-frame {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: block;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 40px 80px rgba(0,0,0,.5);
+    }
 
-.stat p {
-  opacity: 0.75;
-  margin-top: 10px;
-}
+    .hero-shot-fade {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, transparent, var(--bg));
+      border-radius: 0 0 12px 12px;
+      pointer-events: none;
+    }
 
-/* ------------------ BUTTON ------------------ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 30px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
-  color: white;
-  text-decoration: none;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-  transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 0 20px #7c3aed88;
-  border: none;
-  cursor: pointer;
-}
+    /* ── Buttons ─────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: opacity .15s, transform .15s, box-shadow .15s;
+      white-space: nowrap;
+    }
 
-.btn:hover {
-  opacity: 0.85;
-  transform: scale(1.05);
-  box-shadow: 0 0 30px #ec489988;
-}
+    .btn:active { transform: scale(.98); }
 
-.btn-icon {
-  width: 22px;
-  height: 22px;
-  filter: drop-shadow(0 0 4px #000);
-}
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
 
-/* ------------------ CARDS ------------------ */
-.card {
-  padding: 45px;
-  border-radius: 24px;
-  background: #161b22;
-  border: 1px solid #ffffff15;
-  box-shadow: 0 0 30px #00000055;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-}
+    .btn-primary:hover { opacity: .85; }
 
-.card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 0 50px #7c3aed55;
-}
+    .btn-outline {
+      background: transparent;
+      color: var(--sub);
+      border: 1px solid var(--border);
+    }
 
-.tag {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: #7c3aed33;
-  border: 1px solid #7c3aed88;
-  margin-right: 10px;
-  font-size: 0.8rem;
-}
+    .btn-outline:hover { color: var(--text); border-color: var(--border-hi); background: rgba(255,255,255,.04); }
 
-/* ------------------ GRID ------------------ */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 45px;
-}
+    .btn-sm { padding: 8px 16px; font-size: .82rem; }
+    .btn-icon { width: 16px; height: 16px; object-fit: contain; }
 
-@media (max-width: 900px) {
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-}
+    /* ── Divider ─────────────────────────── */
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
 
-/* ------------------ TIMELINE ------------------ */
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
+    /* ── Section shared ──────────────────── */
+    .section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 96px 24px;
+    }
 
-.timeline-item {
-  padding-left: 25px;
-  border-left: 3px solid #7c3aed;
-  transition: transform 0.3s ease;
-}
+    .section-head {
+      margin-bottom: 48px;
+    }
 
-.timeline-item:hover {
-  transform: translateX(6px);
-}
+    .section-eyebrow {
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
 
-.timeline-item h4 {
-  margin: 0;
-  font-size: 1.3rem;
-  text-shadow: 0 0 10px #7c3aed;
-}
+    .section-h2 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -.03em;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
 
-.timeline-item span {
-  font-size: 0.85rem;
-  opacity: 0.7;
-}
+    .section-sub {
+      font-size: .95rem;
+      color: var(--sub);
+      max-width: 440px;
+      line-height: 1.6;
+    }
 
-/* ------------------ FOOTER ------------------ */
-footer {
-  margin-top: 140px;
-  padding: 60px;
-  text-align: center;
-  opacity: 0.6;
-  font-size: 1rem;
-  color: #ccc;
-}
+    /* ── Stats row ───────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
 
-/* ------------------ MODAL ------------------ */
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+    .stat-cell {
+      background: var(--bg-card);
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: background .2s;
+    }
 
-.modal.show {
-  display: flex;
-  animation: modalFadeIn 0.4s ease-out;
-}
+    .stat-cell:hover { background: #18181b; }
 
-.modal-content {
-  background: #161b22;
-  padding: 40px;
-  border-radius: 20px;
-  width: 600px;
-  max-width: 90%;
-  box-shadow: 0 0 30px #000;
-  transform: scale(0.9);
-  animation: modalScaleIn 0.4s ease-out forwards;
-}
+    .stat-val {
+      font-family: 'Geist Mono', monospace;
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
 
-.modal-content h2 {
-  margin-bottom: 20px;
-  text-shadow: 0 0 10px #7c3aed;
-}
+    .stat-key {
+      font-size: .8rem;
+      color: var(--dim);
+      font-weight: 500;
+    }
 
-.modal-step {
-  margin-bottom: 18px;
-  padding: 14px;
-  background: #1b222c;
-  border-radius: 12px;
-  border: 1px solid #ffffff22;
-  font-size: 0.95rem;
-}
+    .stat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 6px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: .72rem;
+      font-weight: 600;
+      background: var(--green-lo);
+      color: var(--green);
+      border: 1px solid var(--green-bd);
+      width: fit-content;
+    }
 
-/* ------------------ MODAL ANIMATIONS ------------------ */
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+    /* ── Feature list ────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
 
-@keyframes modalScaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
+    .feat {
+      background: var(--bg-card);
+      padding: 28px;
+      transition: background .2s;
+    }
 
-/* ------------------ ANIMATIONS ------------------ */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+    .feat:hover { background: #18181b; }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-</style>
+    .feat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      margin-bottom: 16px;
+      color: var(--sub);
+    }
+
+    .feat-icon svg { width: 18px; height: 18px; }
+
+    .feat h3 {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -.01em;
+    }
+
+    .feat p {
+      font-size: .85rem;
+      color: var(--sub);
+      line-height: 1.55;
+    }
+
+    /* ── Download ────────────────────────── */
+    .dl-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .dl-card {
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition: border-color .2s;
+    }
+
+    .dl-card:hover { border-color: var(--border-hi); }
+
+    .dl-card.primary {
+      border-color: var(--accent-bd);
+      background: var(--accent-lo);
+    }
+
+    .dl-card.primary:hover { border-color: rgba(124,58,237,.4); }
+
+    .dl-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: .72rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      width: fit-content;
+    }
+
+    .dl-badge.release {
+      background: var(--accent-lo);
+      color: #a78bfa;
+      border: 1px solid var(--accent-bd);
+    }
+
+    .dl-badge.discord {
+      background: rgba(88,101,242,.1);
+      color: #818cf8;
+      border: 1px solid rgba(88,101,242,.25);
+    }
+
+    .dl-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      margin-bottom: 6px;
+    }
+
+    .dl-card > p {
+      font-size: .85rem;
+      color: var(--sub);
+      margin-bottom: 20px;
+      line-height: 1.55;
+    }
+
+    .dl-list {
+      list-style: none;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .dl-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      font-size: .84rem;
+      color: var(--sub);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dl-list li:last-child { border-bottom: none; }
+
+    .dl-list li::before {
+      content: '';
+      display: block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--dim);
+      flex-shrink: 0;
+    }
+
+    /* ── Timeline ────────────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+
+    .tl-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 24px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+
+    .tl-item:last-child { border-bottom: none; }
+
+    .tl-date {
+      font-family: 'Geist Mono', monospace;
+      font-size: .75rem;
+      color: var(--dim);
+      padding-top: 3px;
+      line-height: 1.4;
+    }
+
+    .tl-content h4 {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -.01em;
+    }
+
+    .tl-content p {
+      font-size: .85rem;
+      color: var(--sub);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+
+    .tl-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .tl-tag {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: .72rem;
+      font-weight: 500;
+      background: rgba(255,255,255,.05);
+      color: var(--dim);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Footer ──────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 960px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-brand {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .footer-brand span { color: var(--dim); font-weight: 400; margin-left: 8px; }
+
+    .footer-links {
+      display: flex;
+      list-style: none;
+      gap: 4px;
+    }
+
+    .footer-links a {
+      display: block;
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: var(--sub);
+      text-decoration: none;
+      font-size: .82rem;
+      transition: color .15s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: .78rem;
+      color: var(--dim);
+      width: 100%;
+    }
+
+    /* ── Scroll top ──────────────────────── */
+    #scroll-top {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--sub);
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s, color .15s, border-color .15s;
+      z-index: 99;
+    }
+
+    #scroll-top.show { opacity: 1; transform: translateY(0); }
+    #scroll-top:hover { color: var(--text); border-color: var(--border-hi); }
+
+    /* ── Modal ───────────────────────────── */
+    .modal-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .modal-bg.open { display: flex; }
+
+    .modal {
+      background: #111114;
+      border: 1px solid var(--border-hi);
+      border-radius: 12px;
+      padding: 32px;
+      width: 560px;
+      max-width: 92vw;
+      animation: modal-in .2s ease;
+    }
+
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(.96) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: -.01em;
+    }
+
+    .modal-step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+
+    .modal-step:last-of-type { border-bottom: none; }
+
+    .step-n {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1px solid var(--border-hi);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .72rem;
+      font-weight: 600;
+      color: var(--dim);
+      font-family: 'Geist Mono', monospace;
+    }
+
+    .modal-step a { color: #a78bfa; text-decoration: none; }
+    .modal-step a:hover { text-decoration: underline; }
+    .modal-step code { font-family: 'Geist Mono', monospace; background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 3px; font-size: .82rem; }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    /* ── Responsive ──────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links, .nav-status { display: none; }
+      .section { padding: 64px 16px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .dl-grid { grid-template-columns: 1fr; }
+      .tl-item { grid-template-columns: 1fr; gap: 4px; }
+      footer { flex-direction: column; gap: 12px; }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
-
 <body>
 
-<div id="particles"></div>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">FlowExecutor <span>v2</span></div>
+  <ul class="nav-links">
+    <li><a href="#status">Status</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#download">Download</a></li>
+    <li><a href="#changelog">Changelog</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-status"><span class="status-dot"></span> Operational</div>
+    <a href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.6.1.3.62/FlowExecutorInstaller0.6.1.3.62.zip" class="btn btn-primary btn-sm">Download</a>
+  </div>
+</nav>
 
-<header class="reveal">
-  <h1>
-    FlowExecutor 
-    <span class="dynamic-word">fast</span>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-kicker">
+    <span class="kicker-dot"></span>
+    Xeno Edition &nbsp;&middot;&nbsp; Key-free
+  </div>
+
+  <h1 class="hero-h1">
+    The executor that's<br>
+    actually <em><span class="word-swap" id="ws">fast</span></em>
   </h1>
-  <p>The most lightweight and beautiful Roblox executor ever</p>
-</header>
 
-<div class="top-section reveal">
-  <div class="top-text">
-    <h2>Welcome to FlowExecutor</h2>
-    <p>The most lightweight, beautiful and fast Roblox executor based on Xeno API.</p>
-  </div>
+  <p class="hero-p">
+    FlowExecutor is a lightweight, key-free Roblox executor built on the Xeno API.
+    Instant injection. Always updated.
+  </p>
 
-  <div class="top-image">
-    <img src="images/flowexecutorv2.png" alt="FlowExecutor Editor">
-  </div>
-</div>
-
-<div class="container">
-
-  <h2 class="section-title reveal">System status</h2>
-
-  <div class="stats-box reveal">
-    <div class="stat">
-      <h3>82</h3>
-      <p>Unc test</p>
-    </div>
-    <div class="stat">
-      <h3>v0.6.1.3.62</h3>
-      <p>Last version aviable</p>
-    </div>
-    <div class="stat">
-      <h3>Online</h3>
-      <p>System status</p>
-    </div>
-  </div>
-
-  <h2 class="section-title reveal">Download</h2>
-
-  <div style="text-align:center; margin-bottom:40px;" class="reveal">
-    <a class="btn" href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.6.1.3.62/FlowExecutorInstaller0.6.1.3.62.zip">
-      <img src="images/xeno_icon.png" class="btn-icon" alt="icon">
-      Download Flow Executor v0.6.1.3.62 Xeno Edition Installer
+  <div class="hero-cta">
+    <a href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.6.1.3.62/FlowExecutorInstaller0.6.1.3.62.zip" class="btn btn-primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download v0.6.1.3.62
+    </a>
+    <a href="https://discord.gg/hcTcPEzGw" class="btn btn-outline">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Discord
     </a>
   </div>
-  <div class="grid-2">
 
-    <div class="card reveal">
-      <h3>Installer finished</h3>
-      <p>A simple installer for flow executor</p>
-      <span class="tag">Exploit</span>
-      <span class="tag">Installer</span><br><br>
-      <p style="opacity:0.85">Changes:</p>
-      <ul style="margin-top:8px; color:#cbd5e1">
-        <li>Bootstrapper</li>
-        <li>Installation</li>
-        <li></li>
-      </ul>
-    </div>
-
-    <div class="card reveal">
-      <h3>About registration</h3>
-      <p>Well, if you wanna register join our <a href="https://discord.gg/hcTcPEzGw">discord server</a> and go to login-add</p>
-      <span class="tag">Discord</span>
-      <span class="tag">Docs</span><br><br>
-      <p style="opacity:0.85">Flow executor is:</p>
-      <ul style="margin-top:8px; color:#cbd5e1">
-        <li>Modern and lightweight</li>
-        <li>Fast execution and attachment</li>
-        <li>Key-free</li>
-      </ul>
-    </div>
-
+  <div class="hero-shot" id="hero-shot">
+    <img src="images/flowexecutorv2.png" alt="FlowExecutor interface" class="hero-shot-frame">
+    <div class="hero-shot-fade"></div>
   </div>
+</section>
 
-  <h2 class="section-title reveal">Recent activity</h2>
+<hr class="divider">
 
-  <div class="timeline">
-
-    <div class="timeline-item reveal">
-      <h4>Flow Executor version roblox upd</h4>
-      <span>8/31/2026 · 8:17 PM</span>
-      <p>We improved a lot the ui and added a lot of cool things</p>
+<!-- STATUS -->
+<div class="section" id="status">
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-val" id="unc-count">82</div>
+      <div class="stat-key">UNC score</div>
+      <div class="stat-tag"><span class="status-dot"></span> Passing</div>
     </div>
-
-    <div class="timeline-item reveal">
-      <h4>FlowExecutor Xeno Edition</h4>
-      <span>8/27/2026 · 7:40 AM</span>
-      <p>FlowExecutor Xeno Edition is back up again!!</p>
+    <div class="stat-cell">
+      <div class="stat-val" style="font-size:1.25rem;padding-top:.35rem">v0.6.1.3.62</div>
+      <div class="stat-key">Latest release</div>
+      <div class="stat-tag">Stable</div>
     </div>
-
-    <div class="timeline-item reveal">
-      <h4>New Login Form added</h4>
-      <span>8/25/2026 · 1:02 PM</span>
-      <p>Btw if u want to create a account ill create a discord server in like 2 hours where you can login there</p>
+    <div class="stat-cell">
+      <div class="stat-val" style="color:var(--green)">Online</div>
+      <div class="stat-key">System status</div>
+      <div class="stat-tag"><span class="status-dot"></span> All systems go</div>
     </div>
-
   </div>
-
 </div>
 
-<footer class="reveal">
-  FLOWEXECUTOR · v0.6.2.3.62
-</footer>
+<hr class="divider">
 
-<!-- MODAL -->
-<div id="velocity-modal" class="modal">
-  <div class="modal-content">
-    <h2>FlowExecutor Velocity Edition — Step by Step</h2>
-    <div id="velocity-steps"></div>
-    <div style="margin-top:25px; display:flex; justify-content:space-between; gap:15px;">
-      <button id="close-modal" class="btn">
-        Close
-      </button>
-      <a id="final-download" class="btn" href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.3.1.3.60/FlowExecutorVelocity0.3.1.3.60.zip">
-        <img src="images/velocity_icon.ico" class="btn-icon" alt="icon">
-        Download Velocity Edition
+<!-- FEATURES -->
+<div class="section" id="features">
+  <div class="section-head">
+    <div class="section-eyebrow">Features</div>
+    <h2 class="section-h2">Built different.</h2>
+    <p class="section-sub">Everything you expect from a modern executor. Nothing you don't.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <h3>Instant injection</h3>
+      <p>Attaches in milliseconds. No waiting, no retrying.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3>Key-free</h3>
+      <p>No keys, no ads, no waiting rooms. Download and run.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <h3>Xeno API</h3>
+      <p>Full Xeno API compatibility. Runs the scripts you care about.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3>Undetected</h3>
+      <p>Engineered to stay under the radar every session.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+      </div>
+      <h3>Auto-update</h3>
+      <p>Bootstrapper keeps you current after every Roblox patch.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <h3>Clean editor</h3>
+      <p>Syntax highlighting, script hub, and a UI that doesn't hurt your eyes.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- DOWNLOAD -->
+<div class="section" id="download">
+  <div class="section-head">
+    <div class="section-eyebrow">Download</div>
+    <h2 class="section-h2">Get started today.</h2>
+    <p class="section-sub">Free. No registration required to run scripts.</p>
+  </div>
+
+  <div class="dl-grid">
+    <div class="dl-card primary" id="dl-left">
+      <div class="dl-badge release">Latest release</div>
+      <h3>Xeno Edition</h3>
+      <p>The recommended release. Comes with an installer and bootstrapper for hands-off updates.</p>
+      <ul class="dl-list">
+        <li>Bootstrapper + installer included</li>
+        <li>Auto-update after Roblox patches</li>
+        <li>Full UNC support &mdash; 82 / 100</li>
+        <li>Clean UI with script editor</li>
+      </ul>
+      <a href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.6.1.3.62/FlowExecutorInstaller0.6.1.3.62.zip" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download v0.6.1.3.62
+      </a>
+    </div>
+
+    <div class="dl-card" id="dl-right">
+      <div class="dl-badge discord">Discord</div>
+      <h3>Community &amp; support</h3>
+      <p>Join the Discord to register an account, report issues, and get notified of new releases.</p>
+      <ul class="dl-list">
+        <li>Account registration in #login-add</li>
+        <li>Patch announcements</li>
+        <li>Script sharing and support</li>
+        <li>Direct contact with the developer</li>
+      </ul>
+      <a href="https://discord.gg/hcTcPEzGw" class="btn btn-outline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Join Discord
       </a>
     </div>
   </div>
 </div>
 
+<hr class="divider">
+
+<!-- CHANGELOG -->
+<div class="section" id="changelog">
+  <div class="section-head">
+    <div class="section-eyebrow">Changelog</div>
+    <h2 class="section-h2">Recent updates.</h2>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-date">Aug 31<br>2026</div>
+      <div class="tl-content">
+        <h4>Roblox update patch</h4>
+        <p>Improved UI and internal stability. Re-injection reliability improved after the Roblox update cycle.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">patch</span>
+          <span class="tl-tag">ui</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Aug 27<br>2026</div>
+      <div class="tl-content">
+        <h4>Xeno Edition restored</h4>
+        <p>Xeno Edition is back online following the previous Roblox patch.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">xeno</span>
+          <span class="tl-tag">uptime</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Aug 25<br>2026</div>
+      <div class="tl-content">
+        <h4>Account registration added</h4>
+        <p>You can now register an account via the Discord server in #login-add.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">auth</span>
+          <span class="tl-tag">discord</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">FlowExecutor <span>v0.6.1.3.62 &middot; by AdriProg2000</span></div>
+  <ul class="footer-links">
+    <li><a href="https://github.com/AdriProg2000/FlowExecutor">GitHub</a></li>
+    <li><a href="https://discord.gg/hcTcPEzGw">Discord</a></li>
+  </ul>
+  <div class="footer-copy">&copy; 2026 FlowExecutor. All rights reserved.</div>
+</footer>
+
+<!-- SCROLL TOP -->
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- MODAL -->
+<div id="vel-modal" class="modal-bg">
+  <div class="modal">
+    <h2>Velocity Edition &mdash; Setup</h2>
+    <div id="vel-steps"></div>
+    <div class="modal-footer">
+      <button id="modal-close" class="btn btn-outline btn-sm">Close</button>
+      <a href="https://github.com/AdriProg2000/FlowExecutor/releases/download/v0.3.1.3.60/FlowExecutorVelocity0.3.1.3.60.zip" class="btn btn-primary btn-sm">Download Velocity</a>
+    </div>
+  </div>
+</div>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
 <script>
-/* TITLE ANIMATION */
-const words = ["fast", "beautiful", "powerful"];
-let index = 0;
-const el = document.querySelector(".dynamic-word");
-
+/* ── Word swap ──────────────────────────── */
+const words = ['fast', 'powerful', 'key-free', 'undetected', 'beautiful'];
+let wi = 0;
+const ws = document.getElementById('ws');
 setInterval(() => {
-  el.style.opacity = 0;
-  el.style.transform = "translateY(10px)";
+  ws.style.opacity = '0';
+  ws.style.transform = 'translateY(6px)';
   setTimeout(() => {
-    index = (index + 1) % words.length;
-    el.textContent = words[index];
-    el.style.opacity = 1;
-    el.style.transform = "translateY(0)";
-  }, 600);
-}, 3000);
+    wi = (wi + 1) % words.length;
+    ws.textContent = words[wi];
+    ws.style.opacity = '1';
+    ws.style.transform = 'translateY(0)';
+  }, 300);
+}, 2600);
 
-/* PARTICLES */
-const container = document.getElementById("particles");
-for (let i = 0; i < 120; i++) {
-  const p = document.createElement("div");
-  p.classList.add("particle");
-  p.style.left = Math.random() * 100 + "%";
-  p.style.top = Math.random() * 100 + "%";
-  p.style.animationDuration = (6 + Math.random() * 8) + "s";
-  p.style.animationDelay = Math.random() * 3 + "s";
-  container.appendChild(p);
-}
+/* ── Scroll top ─────────────────────────── */
+const scrollTopBtn = document.getElementById('scroll-top');
+window.addEventListener('scroll', () => {
+  scrollTopBtn.classList.toggle('show', window.scrollY > 400);
+}, { passive: true });
 
-/* SCROLL REVEAL */
-const reveals = document.querySelectorAll(".reveal");
-function revealOnScroll() {
-  const trigger = window.innerHeight * 0.85;
-  reveals.forEach(el => {
-    const top = el.getBoundingClientRect().top;
-    if (top < trigger) el.classList.add("visible");
+/* ── GSAP ───────────────────────────────── */
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero — subtle entrance
+const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+tl.from('.hero-kicker', { opacity: 0, y: 10, duration: .5 }, .1)
+  .from('.hero-h1',     { opacity: 0, y: 16, duration: .55 }, .2)
+  .from('.hero-p',      { opacity: 0, y: 12, duration: .5 }, .35)
+  .from('.hero-cta',    { opacity: 0, y: 10, duration: .45 }, .48)
+  .from('#hero-shot',   { opacity: 0, y: 28, duration: .7 }, .55);
+
+// Parallax — very gentle, just enough to feel alive
+gsap.to('#hero-shot', {
+  scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 },
+  y: -50, ease: 'none'
+});
+
+// Stat cells
+gsap.utils.toArray('.stat-cell').forEach((el, i) => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 88%' },
+    opacity: 0, y: 14,
+    duration: .5, delay: i * .08,
+    ease: 'power2.out'
   });
-}
-window.addEventListener("scroll", revealOnScroll);
-revealOnScroll();
-
-/* MODAL LOGIC */
-const velocityBtn = document.getElementById("velocity-download-btn");
-const modal = document.getElementById("velocity-modal");
-const closeModal = document.getElementById("close-modal");
-const stepsContainer = document.getElementById("velocity-steps");
-
-const steps = [
-  "1. Use this roblox <a href='https://github.com/vnnaworks/weblauncher/releases/download/2.1.5/weblauncher.exe' target='_blank' class='step-link'>outdate tool</a>",
-  "2. Go to Windows Security then Virus and threat protection, virus and threat protection settings",
-  "3. Click on manage settings and turn real time protection to off (Its cause Windows Security overdetects Roblox Exploits)",
-  "4. Download the .zip and extract it, there should be a .exe of flow executor, then with the roblox outdate tool, outdate roblox to version to (version-145f189a6a974303)",
-  "If you have any trouble installing Flow Executor Velocity Edition DM me in discord, the username: adrin3a4a_07716"
-];
-
-velocityBtn.addEventListener("click", () => {
-  stepsContainer.innerHTML = steps
-    .map(s => `<div class="modal-step">${s}</div>`)
-    .join("");
-  modal.classList.add("show");
 });
 
-closeModal.addEventListener("click", () => {
-  modal.classList.remove("show");
-});
-
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.classList.remove("show");
+// UNC counter
+ScrollTrigger.create({
+  trigger: '#unc-count',
+  start: 'top 85%',
+  once: true,
+  onEnter() {
+    const el = document.getElementById('unc-count');
+    gsap.to({ v: 0 }, {
+      v: 82, duration: 1.2, ease: 'power2.out',
+      onUpdate() { el.textContent = Math.round(this.targets()[0].v); }
+    });
   }
 });
-</script>
 
+// Feature cards — stagger by row
+gsap.utils.toArray('.feat').forEach((el, i) => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 90%' },
+    opacity: 0, y: 12,
+    duration: .45, delay: (i % 3) * .06,
+    ease: 'power2.out'
+  });
+});
+
+// Download cards
+gsap.from('#dl-left', {
+  scrollTrigger: { trigger: '#dl-left', start: 'top 88%' },
+  opacity: 0, y: 16, duration: .5, ease: 'power2.out'
+});
+gsap.from('#dl-right', {
+  scrollTrigger: { trigger: '#dl-right', start: 'top 88%' },
+  opacity: 0, y: 16, duration: .5, delay: .08, ease: 'power2.out'
+});
+
+// Timeline
+gsap.utils.toArray('.tl-item').forEach((el, i) => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 90%' },
+    opacity: 0, y: 10,
+    duration: .4, delay: i * .07,
+    ease: 'power2.out'
+  });
+});
+
+/* ── Modal ──────────────────────────────── */
+const modal = document.getElementById('vel-modal');
+document.getElementById('modal-close').onclick = () => modal.classList.remove('open');
+modal.onclick = e => { if (e.target === modal) modal.classList.remove('open'); };
+
+const velSteps = [
+  { n: 1, t: 'Download and run the <a href="https://github.com/vnnaworks/weblauncher/releases/download/2.1.5/weblauncher.exe">Roblox outdate tool</a>.' },
+  { n: 2, t: 'Open Windows Security &rarr; Virus &amp; threat protection &rarr; Manage settings.' },
+  { n: 3, t: 'Disable Real-time protection temporarily.' },
+  { n: 4, t: 'Extract the .zip and run FlowExecutor.exe. Outdate Roblox to <code>version-145f189a6a974303</code>.' },
+  { n: '?', t: 'Questions? DM <strong>adrin3a4a_07716</strong> on Discord.' },
+];
+
+document.getElementById('vel-steps').innerHTML = velSteps
+  .map(s => `<div class="modal-step"><span class="step-n">${s.n}</span><span>${s.t}</span></div>`)
+  .join('');
+
+window.openVelocityModal = () => modal.classList.add('open');
+</script>
 </body>
 </html>
